@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Button, Form, Alert } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as yup from "yup";
 import axios from "axios";
@@ -22,6 +22,7 @@ function CreateForm(formData = emptyForm) {
     checkbox: "",
   });
 
+  const [submissionSuccess, setSubmissionSuccess] = useState(false);
   const validationSchema = yup.object().shape({
     name: yup.string().min(2).required("Name Surname is required!"),
     email: yup.string().email().required("Email is required"),
@@ -46,14 +47,14 @@ function CreateForm(formData = emptyForm) {
     }
 
     if (formValid) {
-      console.log("Form Submitted! ", e);
-
       const endpoint = "https://reqres.in/api/users";
 
       axios
-        .post(endpoint, data)
+        .post("https://reqres.in/api/users", data)
         .then((res) => {
-          console.log("POST success!");
+          console.log("POST success!", res);
+          setSubmissionSuccess(true);
+          setTimeout(() => setSubmissionSuccess(false), 5000);
         })
         .catch((err) => {
           console.error("POST error!", err);
@@ -155,6 +156,9 @@ function CreateForm(formData = emptyForm) {
         <Button variant="primary" type="submit">
           Submit
         </Button>
+        {submissionSuccess && (
+          <Alert variant="success">Form successfully submitted!</Alert>
+        )}
       </Form>
     </>
   );
