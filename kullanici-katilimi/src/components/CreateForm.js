@@ -5,7 +5,8 @@ import * as yup from "yup";
 import axios from "axios";
 
 const emptyForm = {
-  name: "",
+  firstName: "",
+  lastName: "",
   email: "",
   password: "",
   checkbox: false,
@@ -13,10 +14,11 @@ const emptyForm = {
 
 function CreateForm(formData = emptyForm) {
   const [data, setData] = useState(formData);
-  const { name, email, password, checkbox } = data;
+  const { firstName, lastName, email, password, checkbox } = data;
   const [formValid, setFormValid] = useState(true);
   const [formErrors, setFormErrors] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
     checkbox: "",
@@ -25,7 +27,8 @@ function CreateForm(formData = emptyForm) {
   const [users, setUsers] = useState([]);
 
   const validationSchema = yup.object().shape({
-    name: yup.string().min(2).required("Name Surname is required!"),
+    firstName: yup.string().min(2).required("First Name is required!"),
+    lastName: yup.string().min(2).required("Last Name is required!"),
     email: yup.string().email().required("Email is required"),
     password: yup
       .string()
@@ -41,6 +44,15 @@ function CreateForm(formData = emptyForm) {
     checkValidationFor(name, type === "checkbox" ? checked : value);
   };
 
+  useEffect(() => {
+    axios
+      .get("https://reqres.in/api/users")
+      .then((response) => {
+        setUsers(response.data.data);
+      })
+      .catch((error) => console.error("API error:", error));
+  }, []);
+
   const submitForm = (e) => {
     e.preventDefault();
     for (let key in data) {
@@ -53,11 +65,23 @@ function CreateForm(formData = emptyForm) {
       axios
         .post(endpoint, data)
         .then((res) => {
-          console.log("POST success!", res);
-          console.log(res.data);
+          const newUser = {
+            ...res.data,
+            first_name: res.data.firstName,
+            last_name: res.data.lastName,
+            email: res.data.email,
+          };
           setSubmissionSuccess(true);
           setTimeout(() => setSubmissionSuccess(false), 5000);
-          setUsers((prevUsers) => [...prevUsers, res.data]);
+          setUsers((prevUsers) => [...prevUsers, newUser]);
+          setData(emptyForm);
+          setFormErrors({
+            firstName: "",
+            lastName: "",
+            email: "",
+            password: "",
+            checkbox: "",
+          });
         })
         .catch((err) => {
           console.error("POST error!", err);
@@ -65,8 +89,6 @@ function CreateForm(formData = emptyForm) {
     }
   };
   const checkValidationFor = (field, value) => {
-    console.log("Validating field:", field, "Value:", value);
-
     yup
       .reach(validationSchema, field)
       .validate(value)
@@ -77,7 +99,6 @@ function CreateForm(formData = emptyForm) {
         }));
       })
       .catch((err) => {
-        console.log("Validation error for", field, ":", err.errors[0]);
         setFormErrors((prevFormErrors) => ({
           ...prevFormErrors,
           [field]: err.errors[0],
@@ -94,21 +115,35 @@ function CreateForm(formData = emptyForm) {
 
       <Form onSubmit={submitForm}>
         <Form.Group className="mb-3">
-          <Form.Label> Name Surname </Form.Label>
+          <Form.Label> First Name </Form.Label>
           <Form.Control
             required
-            name="name"
+            name="firstName"
             type="text"
-            value={name}
-            placeholder="name surname"
+            value={firstName}
+            placeholder="First Name"
             onChange={onChange}
-            isInvalid={!!formErrors.name}
-          />{" "}
+            isInvalid={!!formErrors.firstName}
+          />
           <Form.Control.Feedback type="invalid">
-            {formErrors.name}
+            {formErrors.firstName}
           </Form.Control.Feedback>
         </Form.Group>
-
+        <Form.Group className="mb-3">
+          <Form.Label>Last Name</Form.Label>
+          <Form.Control
+            required
+            name="lastName"
+            type="text"
+            value={data.lastName}
+            placeholder="Last Name"
+            onChange={onChange}
+            isInvalid={!!formErrors.lastName}
+          />
+          <Form.Control.Feedback type="invalid">
+            {formErrors.lastName}
+          </Form.Control.Feedback>
+        </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label> Enter e-mail </Form.Label>
           <Form.Control
@@ -163,8 +198,14 @@ function CreateForm(formData = emptyForm) {
           <Alert variant="success">Form successfully submitted!</Alert>
         )}
 
-        <h4>Users:</h4>
-        <pre>{JSON.stringify(name, email)}</pre>
+        <h>Users:</h4>
+        <ol>
+          {users.map((user) => (
+            <li key={user.id}>
+              {user.first_name} - {user.email}
+            </li>
+          ))}
+        </ol>
       </Form>
     </>
   );
