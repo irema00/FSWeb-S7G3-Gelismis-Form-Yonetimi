@@ -38,11 +38,7 @@ function CreateForm() {
 
         <Form.Group className="mb-3">
           <Form.Label> Terms Of Service </Form.Label>
-          <Form.Check
-            type="checkbox"
-            placeholder="password"
-            checked={checkbox}
-          />
+          <Form.Check type="checkbox" checked={checkbox} />
         </Form.Group>
 
         <Button variant="primary" type="submit">
