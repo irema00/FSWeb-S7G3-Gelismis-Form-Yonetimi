@@ -2,18 +2,26 @@ import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 import { Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import * as yup from "yup";
+import { userSchema } from "./UserValidation";
 
 function CreateForm() {
   const [name, setName] = useState("");
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [checkbox, setCheckbox] = useState("");
+  const [checkbox, setCheckbox] = useState(false);
 
+  const submitForm = (e) => {
+    e.preventDefault();
+    console.log(name, email, password, checkbox);
+  };
+
+  const handleCheck = () => setCheckbox(!checkbox);
   return (
     <>
-      <h3>Sign Up</h3>
-      <Form>
+      <h3>Registration Form</h3>
+
+      <Form onSubmit={submitForm}>
         <Form.Group className="mb-3">
           <Form.Label> Name Surname </Form.Label>
           <Form.Control
@@ -53,12 +61,12 @@ function CreateForm() {
             required
             type="checkbox"
             checked={checkbox}
-            onChange={(e) => setCheckbox(e.target.checked)}
+            onClick={handleCheck}
           />
         </Form.Group>
 
         <Button variant="primary" type="submit">
-          Sign Up
+          Submit
         </Button>
       </Form>
     </>
