@@ -21,8 +21,9 @@ function CreateForm(formData = emptyForm) {
     password: "",
     checkbox: "",
   });
-
   const [submissionSuccess, setSubmissionSuccess] = useState(false);
+  const [users, setUsers] = useState([]);
+
   const validationSchema = yup.object().shape({
     name: yup.string().min(2).required("Name Surname is required!"),
     email: yup.string().email().required("Email is required"),
@@ -50,11 +51,13 @@ function CreateForm(formData = emptyForm) {
       const endpoint = "https://reqres.in/api/users";
 
       axios
-        .post("https://reqres.in/api/users", data)
+        .post(endpoint, data)
         .then((res) => {
           console.log("POST success!", res);
+          console.log(res.data);
           setSubmissionSuccess(true);
           setTimeout(() => setSubmissionSuccess(false), 5000);
+          setUsers((prevUsers) => [...prevUsers, res.data]);
         })
         .catch((err) => {
           console.error("POST error!", err);
@@ -159,6 +162,9 @@ function CreateForm(formData = emptyForm) {
         {submissionSuccess && (
           <Alert variant="success">Form successfully submitted!</Alert>
         )}
+
+        <h4>Users:</h4>
+        <pre>{JSON.stringify(name, email)}</pre>
       </Form>
     </>
   );
