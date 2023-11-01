@@ -135,7 +135,7 @@ function CreateForm(formData = emptyForm) {
             required
             name="lastName"
             type="text"
-            value={data.lastName}
+            value={lastName}
             placeholder="Last Name"
             onChange={onChange}
             isInvalid={!!formErrors.lastName}
@@ -198,7 +198,7 @@ function CreateForm(formData = emptyForm) {
           <Alert variant="success">Form successfully submitted!</Alert>
         )}
 
-        <h>Users:</h4>
+        <h4>Users:</h4>
         <ol>
           {users.map((user) => (
             <li key={user.id}>
