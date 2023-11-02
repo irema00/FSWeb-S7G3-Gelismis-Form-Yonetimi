@@ -22,7 +22,9 @@ describe("CreateForm Tests", () => {
     cy.get('input[type="checkbox"]').uncheck();
     cy.get(".alert-success").should("not.exist");
   });
-
+  it("submits the form", () => {
+    cy.get("form").submit();
+  });
   it("should successfully submit form data using POST request and display alert-success after submission", () => {
     cy.intercept("POST", "https://reqres.in/api/users").as("postUser");
     cy.get('input[name="firstName"]').type("John");
@@ -33,14 +35,6 @@ describe("CreateForm Tests", () => {
     cy.get('button[type="submit"]').click();
     cy.wait("@postUser").its("response.statusCode").should("eq", 201);
     cy.get(".alert-success").should("contain", "Form successfully submitted!");
-  });
-
-  it("submits the form", () => {
-    cy.get("form").submit();
-  });
-
-  it("loads users list", () => {
-    cy.get("ol").find("li").should("have.length.greaterThan", 0);
   });
   it("should successfully make a GET request to load users", () => {
     cy.intercept("GET", "https://reqres.in/api/users").as("getUsers");
